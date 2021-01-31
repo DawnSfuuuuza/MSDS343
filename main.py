@@ -1,56 +1,30 @@
-import os
-import jinja2
-import webapp2
+import logging
 
-template_dir = os.path.join(os.path.dirname(__file__), "templates")
-jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader(template_dir), autoescape=False)
+from flask import Flask
+app = Flask(__name__)
 
 
-class BaseHandler(webapp2.RequestHandler):
+@app.route('/')
+def hello():
+    """Return a friendly HTTP greeting."""
+    return 'Hello World!'
 
-    def write(self, *a, **kw):
-        return self.response.out.write(*a, **kw)
-
-    def render_str(self, template, **params):
-        t = jinja_env.get_template(template)
-        return t.render(params)
-
-    def render(self, template, **kw):
-        return self.write(self.render_str(template, **kw))
-
-    def render_template(self, view_filename, params=None):
-        if params is None:
-            params = {}
-        template = jinja_env.get_template(view_filename)
-        return self.response.out.write(template.render(params))
+@app.route('/newroute/<name>')
+def newroute(name):
+    """parameter"""
+    return "this was passed in: %s" % name
 
 
-# handlers
-class MainHandler(BaseHandler):
-    def get(self):
-        message = "This is my message"
-        return self.render_template("hello.html", params={"message": message})
+@app.errorhandler(500)
+def server_error(e):
+    logging.exception('An error occurred during a request.')
+    return """
+    An internal error occurred: <pre>{}</pre>
+    See logs for full stacktrace.
+    """.format(e), 500
 
 
-# URLs
-app = webapp2.WSGIApplication([
-    webapp2.Route('/', MainHandler),
-], debug=True)
-
-# run on server
-localhost = True  # True: non-GAE localhost server; False: GAE on either localhost or on Google Cloud
-if localhost:
-    def main():
-        from paste import httpserver
-        from paste.cascade import Cascade
-        from paste.urlparser import StaticURLParser
-
-        assets_dir = os.path.join(os.path.dirname(__file__))
-        static_app = StaticURLParser(directory=assets_dir)
-
-        web_app = Cascade([app, static_app])
-        httpserver.serve(web_app, host='localhost', port='8080')
-
-
-    if __name__ == '__main__':
-        main()
+if __name__ == '__main__':
+    # This is used when running locally. Gunicorn is used to run the
+    # application on Google App Engine. See entrypoint in app.yaml.
+    app.run(host='127.0.0.1', port=8080, debug=True)
