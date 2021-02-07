@@ -5,7 +5,7 @@ import requests
 import io
 
 
-url = "REPLACE-THIS-WITH-THE-URL-OF-THE-CSV-FILE" # Make sure the url is the raw version of the file on GitHub
+url = "https://github.com/DawnSfuuuuza/MSDS343/blob/main/Project.csv" # Make sure the url is the raw version of the file on GitHub
 download = requests.get(url).content
 
 # Reading the downloaded content and turning it into a pandas dataframe
