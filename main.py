@@ -1,14 +1,17 @@
 
 from flask import Flask, escape, request
+import pandas as pd
+import requests
+import io
 
-app = Flask(__name__)
 
-@app.route('/')
+url = "REPLACE-THIS-WITH-THE-URL-OF-THE-CSV-FILE" # Make sure the url is the raw version of the file on GitHub
+download = requests.get(url).content
 
-def hello_world():
-    name = request.args.get("name", "World")
-    return f'Hello, World!, {escape(name)}!'
-if __name__ == '__main__':
-    # This is used when running locally. Gunicorn is used to run the
-    # application on Google App Engine. See entrypoint in app.yaml.
-    app.run(host='127.0.0.1', port=8080, debug=True)
+# Reading the downloaded content and turning it into a pandas dataframe
+
+df = pd.read_csv(io.StringIO(download.decode('utf-8')))
+
+# Printing out the first 5 rows of the dataframe
+
+print (df.head())
