@@ -18,4 +18,8 @@ libraries:
   version: latest
 - name: flask
   version: latest
+- name: numpy
+  version: latest  
+- name: pandas
+  version: latest
 
