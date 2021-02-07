@@ -1,10 +1,14 @@
-  
-from flask import Flask
+
+from flask import Flask, escape, request
+
 app = Flask(__name__)
 
-@app.route("/")
-def hello():
-    return "Hello World!"
+@app.route('/')
 
+def hello_world():
+    name = request.args.get("name", "World")
+    return f'Hello, World!, {escape(name)}!'
 if __name__ == '__main__':
-    app.run()
+    # This is used when running locally. Gunicorn is used to run the
+    # application on Google App Engine. See entrypoint in app.yaml.
+    app.run(host='127.0.0.1', port=8080, debug=True)
